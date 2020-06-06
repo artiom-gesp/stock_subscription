@@ -28,6 +28,15 @@ def create_subscription(db, subscription_in: SubscriptionIn):
 def get_stock(db, **kwargs):
     return db.query(Stock).filter_by(**kwargs).first()
 
+def get_stocks(db, **kwargs):
+    return db.query(Stock).filter_by(**kwargs).all()
+
+def get_subscription(db, **kwargs):
+    return db.query(Subscription).filter_by(**kwargs).first()
+
+def get_subscriptions(db, **kwargs):
+    return db.query(Subscription).filter_by(**kwargs).all()
+
 def get_stocks_by_subscription(db):
     return db.query(Subscription, Stock).join(Stock).all()
 

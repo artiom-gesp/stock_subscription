@@ -26,31 +26,39 @@ def send_cross_message(name, current_price, cross_value):
     }
     requests.get(SMS_SERVER, params=params)
 
+def get_stock_data(stock):
+    name = stock.full_name if stock.full_name else stock.ticker_symbol
+    print(f"Downloading data : {name} - {datetime.datetime.now(tz=curr_timezone)}")
+    try:
+        data = exec_without_print(yf.download, stock.ticker_symbol, period="1d", interval="1m")[-1:]
+    except Exception as e:
+        print(e)
+        print(f"Error fetching {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
+        return None
+    if data is None:
+        print(f"Error fetching (Data is None) {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
+    if data.empty:
+        print(f"Error fetching (empty) {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
+        return None
+
+    return data
 
 def check_subscriptions(db):
     data = crud.get_stocks_by_subscription(db)
-    for subscription, stock in data:
+    stocks = crud.get_stocks(db)
+    for stock in stocks:
         name = stock.full_name if stock.full_name else stock.ticker_symbol
-        print(f"Downloading data : {name} - {datetime.datetime.now(tz=curr_timezone)}")
-        try:
-            data = exec_without_print(yf.download, stock.ticker_symbol, period="1d", interval="1m")[-1:]
-        except Exception as e:
-            print(e)
-            print(f"Error fetching {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
-            continue
+        subscriptions = crud.get_subscriptions(db, stock_id=stock.id)
+        print(f"Getting subscriptions for {name} - {datetime.datetime.now(tz=curr_timezone)}")
+        data = get_stock_data(stock)
         if data is None:
-            print(data)
-            print(f"Error fetching (Data is None) {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
-            continue
-        if data.empty:
-            print(f"Error fetching (empty) {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
             continue
         current_price = round(data['Adj Close'][0], 3)
-        if subscription.type == 'cross' and has_crossed(current_price, stock.last_price, subscription.value):
-            print(f"HAS_CROSSED {name} - {datetime.datetime.now(tz=curr_timezone)}")
-            send_cross_message(name, current_price, subscription.value)
-            crud.delete_subscription(db, id=subscription.id)                
-
+        for subscription in subscriptions:
+            if subscription.type == 'cross' and has_crossed(current_price, stock.last_price, subscription.value):
+                print(f"HAS_CROSSED {name} - {datetime.datetime.now(tz=curr_timezone)}")
+                send_cross_message(name, current_price, subscription.value)
+                crud.delete_subscription(db, id=subscription.id)        
         update = StockUpdate(last_price=current_price, last_fetch_date=datetime.datetime.now(tz=curr_timezone))
         crud.update_stock(db, stock, stock_in=update)
 
