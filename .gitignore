@@ -1,3 +1,7 @@
+conf.py
+stock_subscriber/stock_subscriber/config/conf.py
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
