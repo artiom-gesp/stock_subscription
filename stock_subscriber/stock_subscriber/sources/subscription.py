@@ -6,6 +6,7 @@ import requests
 from pytz import timezone
 from stock_subscriber.sources import crud
 from stock_subscriber.sources.schemas import SubscriptionIn, StockIn, StockUpdate
+from stock_subscriber.sources.utils import exec_without_print
 from stock_subscriber.config.conf import SMS_LOGIN, SMS_SERVER
 from sqlalchemy.exc import IntegrityError
 
@@ -13,9 +14,6 @@ curr_timezone = tz=timezone('Europe/Paris')
 
 
 def has_crossed(current_price, last_price, cross_value):
-    print(f'la {last_price}')
-    print(f'cr {cross_value}')
-    print(f'cu {current_price}')
     return last_price < cross_value < current_price or current_price < cross_value < last_price
 
 
@@ -35,14 +33,17 @@ def check_subscriptions(db):
         name = stock.full_name if stock.full_name else stock.ticker_symbol
         print(f"Downloading data : {name} - {datetime.datetime.now(tz=curr_timezone)}")
         try:
-            data = yf.download(stock.ticker_symbol, period="1d", interval="1m")[-1:]
+            data = exec_without_print(yf.download, stock.ticker_symbol, period="1d", interval="1m")[-1:]
         except Exception as e:
             print(e)
             print(f"Error fetching {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
             continue
         if data is None:
             print(data)
-            print(f"Error fetching {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
+            print(f"Error fetching (Data is None) {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
+            continue
+        if data.empty:
+            print(f"Error fetching (empty) {stock.ticker_symbol} - {datetime.datetime.now(tz=curr_timezone)}")
             continue
         current_price = round(data['Adj Close'][0], 3)
         if subscription.type == 'cross' and has_crossed(current_price, stock.last_price, subscription.value):
