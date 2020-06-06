@@ -1,4 +1,4 @@
 TODO : 
-- Find a way to similate a trading strategy.
+- Find a way to simulate a trading strategy.
 - Try basic trading algorithms.
 - Establish API connection with Interactive Brokers.

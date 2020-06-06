@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  stock_backend:
+    build: ./stock_subscriber
+    env_file:
+      - .env
+    volumes:
+      - ./stock_subscriber/:/stock_subscriber
+    ports:
+      - 8000:8000
+    depends_on:
+      - stock_db
+  stock_db:
+    image: mysql:8.0
+    command: ['--sql_mode=', '--default-authentication-plugin=mysql_native_password']
+    ports:
+      - 3308:3306
+    env_file:
+      - .env
