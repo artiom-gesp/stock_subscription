@@ -1,4 +1,4 @@
-from stock_subscriber.sources.database import SessionLocal
+from stock_subscriber.sources.base import SessionLocal
 import sys, os
 
 

@@ -1,12 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.ext.declarative import declarative_base
-
 import stock_subscriber.config.conf as settings
-engine = create_engine(settings.SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+from stock_subscriber.sources import crud
+from stock_subscriber.sources.schemas import UserInDB
+from stock_subscriber.sources.account_utils import pwd_context
+from stock_subscriber.sources.base import Base, engine
 
-Base = declarative_base()
 
-def init_db(session: Session) -> None:  # pylint: disable=invalid-name
+
+def init_db(db: Session) -> None:  # pylint: disable=invalid-name
     Base.metadata.create_all(bind=engine)
+    admin = UserInDB(username=settings.ADMIN_USERNAME, hashed_password=pwd_context.hash(settings.ADMIN_PASSWORD))
+    crud.create_user(db, user_in=admin)

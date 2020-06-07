@@ -20,3 +20,31 @@ class SubscriptionIn(BaseModel):
     type: str
     value: float
     expire: Optional[str] = None
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: str = None
+
+class User(BaseModel):
+    username: str
+
+class UserInDB(User):
+    hashed_password: str
+
+class NoteIn(BaseModel):
+    title: str
+    user_id: Optional[int]
+    date: Optional[datetime]
+    content: str
+    categories: List[int]
+
+class NoteUpdate(BaseModel):
+    title: Optional[str]
+    content: Optional[str]
+    categories: Optional[List[int]] = []
+
+class CategoryIn(BaseModel):
+    name: int

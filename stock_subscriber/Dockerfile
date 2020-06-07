@@ -13,4 +13,4 @@ COPY . /stock_subscriber
 
 RUN pip3 install -e .
 
-CMD ["./wait-for-it.sh", "stock_db:3306", "--timeout=30", "--", "uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./wait-for-it.sh", "stock_db:3306", "--timeout=30", "--", "uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000", "--use-colors"]

@@ -1,12 +1,20 @@
-from stock_subscriber.sources.database import SessionLocal, init_db
-from stock_subscriber.sources.api.api import router
+from stock_subscriber.sources.database import init_db
+from stock_subscriber.sources.base import SessionLocal
+from stock_subscriber.sources.api.subscription import router as sub_router 
+from stock_subscriber.sources.api.account import router as acc_router
+from stock_subscriber.sources.api.note import router as note_router
 from fastapi import APIRouter, Depends, HTTPException, status
 from stock_subscriber.sources.subscription import check_subscriptions
 from fastapi_utils.tasks import repeat_every
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 import argparse
 
 app = FastAPI()
+
+origins = [
+    "*",
+]
 
 
 @app.on_event("startup")
@@ -27,4 +35,14 @@ def root():
     return {"message": "Hello World"}
 
 
-app.include_router(router)
+app.include_router(sub_router)
+app.include_router(acc_router)
+app.include_router(note_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
