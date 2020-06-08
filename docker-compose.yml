@@ -11,6 +11,14 @@ services:
       - 8000:8000
     depends_on:
       - stock_db
+  stock_frontend:
+      build: ./webapp
+      env_file:
+        - .env
+      volumes:
+        - ./webapp/src:/app/src
+      ports:
+        - 8080:8080
   stock_db:
     image: mysql:8.0
     command: ['--sql_mode=', '--default-authentication-plugin=mysql_native_password']
