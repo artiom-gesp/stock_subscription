@@ -15,3 +15,8 @@ SMS_LOGIN = {
 }
 
 SMS_SERVER = ''
+
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 3
+
+ADMIN_USERNAME = 'super'
+ADMIN_PASSWORD = 'super_upper'
