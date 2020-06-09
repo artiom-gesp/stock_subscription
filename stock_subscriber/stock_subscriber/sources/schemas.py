@@ -19,7 +19,7 @@ class SubscriptionIn(BaseModel):
     ticker_symbol: str
     type: str
     value: float
-    expire: Optional[str] = None
+    expire: Optional[int] = None
 
 class Token(BaseModel):
     access_token: str

@@ -31,6 +31,7 @@ def post_note(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):  
+    print(note_in)
     note_in.user_id = current_user.id
     note_in.date = datetime.datetime.now(tz=curr_timezone)
     return crud.create_note(db, note_in=note_in)
@@ -55,3 +56,20 @@ def delete_note(
     db: Session = Depends(get_db)
 ):
     note = crud.delete_note(db, note_id=note_id)
+
+
+@router.get("/import_json/")
+def check_subscription(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    import json
+    with open('/stock_subscriber/import.json', 'rb') as f:
+        json = json.load(f)
+    data = json[2]['data']
+    for row in data:
+        try:
+            note_in = NoteIn(user_id=current_user.id, title=row['title'], content=row['content'], date=datetime.datetime.strptime(row['date'], '%Y-%m-%d'), categories=[])
+            crud.create_note(db, note_in=note_in)
+        except:
+            continue
