@@ -1,5 +1,4 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session
 import stock_subscriber.config.conf as settings
 from stock_subscriber.sources import crud
 from stock_subscriber.sources.schemas import UserInDB
