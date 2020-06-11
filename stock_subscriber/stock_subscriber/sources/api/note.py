@@ -17,7 +17,7 @@ def get_note(
 ):
     return crud.get_note(db, id=note_id)
 
-@router.get("/note/")
+@router.get("/note")
 def get_notes(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -25,7 +25,7 @@ def get_notes(
     return crud.get_notes(db, user_id=current_user.id)
 
 
-@router.post("/note/")
+@router.post("/note")
 def post_note(
     note_in: NoteIn,
     current_user: User = Depends(get_current_user),
@@ -58,7 +58,7 @@ def delete_note(
     note = crud.delete_note(db, note_id=note_id)
 
 
-@router.get("/import_json/")
+@router.get("/import_json")
 def check_subscription(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
