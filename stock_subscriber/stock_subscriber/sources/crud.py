@@ -52,7 +52,7 @@ def update_stock(db, db_obj, stock_in: StockIn):
     return db_obj
 
 def delete_subscription(db, id):
-    obj = db.query(Subscription).filter(id == id).first()
+    obj = get_subscription(db, id=id)
     if obj is not None:
         db.delete(obj)
         db.commit()
@@ -106,7 +106,7 @@ def create_category(db, category_in: CategoryIn):
     return category
 
 def delete_note(db, note_id):
-    obj = db.query(Note).filter(id == id).first()
+    obj = get_note(db, id=note_id)
     if obj is not None:
         db.delete(obj)
         db.commit()

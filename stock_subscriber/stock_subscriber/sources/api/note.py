@@ -15,7 +15,7 @@ def get_note(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    return crud.get_note(db, id=note_id)
+    return crud.get_note(db, id=note_id, user_id=current_user.id)
 
 @router.get("/note")
 def get_notes(
@@ -31,7 +31,6 @@ def post_note(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):  
-    print(note_in)
     note_in.user_id = current_user.id
     note_in.date = datetime.datetime.now(tz=curr_timezone)
     return crud.create_note(db, note_in=note_in)
@@ -43,7 +42,7 @@ def put_note(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    note = crud.get_note(db, id=note_id)
+    note = crud.get_note(db, id=note_id, user_id=current_user.id)
     if note:
         note = crud.update_note(db, db_obj=note, note_in=note_in)
         return note
@@ -55,11 +54,14 @@ def delete_note(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    note = crud.delete_note(db, note_id=note_id)
+    note = crud.get_note(db, id=note_id, user_id=current_user.id)
+    if note:
+        crud.delete_note(db, note_id=note_id)
+        return True
 
 
 @router.get("/import_json")
-def check_subscription(
+def import_json(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
